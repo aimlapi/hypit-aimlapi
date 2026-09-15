@@ -177,6 +177,9 @@ importers:
       '@hypit/protocol':
         specifier: workspace:*
         version: link:packages/protocol
+      '@hypit/provider-aimlapi':
+        specifier: workspace:*
+        version: link:packages/provider-aimlapi
       '@hypit/provider-hyperframes-local':
         specifier: workspace:*
         version: link:packages/provider-hyperframes-local
@@ -2142,6 +2145,40 @@ importers:
   packages/project-context-node: {}
 
   packages/protocol: {}
+
+  packages/provider-aimlapi:
+    dependencies:
+      '@hypit/endpoint-kit':
+        specifier: workspace:*
+        version: link:../endpoint-kit
+      '@hypit/generation':
+        specifier: workspace:*
+        version: link:../generation
+      '@hypit/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+      '@hypit/runtime-kit':
+        specifier: workspace:*
+        version: link:../runtime-kit
+    devDependencies:
+      '@hypit/driver-node':
+        specifier: workspace:*
+        version: link:../driver-node
+      '@hypit/gpt-image':
+        specifier: workspace:*
+        version: link:../gpt-image
+      '@hypit/grok-imagine':
+        specifier: workspace:*
+        version: link:../grok-imagine
+      '@hypit/minimax-h3':
+        specifier: workspace:*
+        version: link:../minimax-h3
+      '@hypit/nano-banana':
+        specifier: workspace:*
+        version: link:../nano-banana
+      '@hypit/seedance':
+        specifier: workspace:*
+        version: link:../seedance
 
   packages/provider-hyperframes-local:
     dependencies:
