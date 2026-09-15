@@ -21,7 +21,7 @@ const AIMLAPI_HOST = "api.aimlapi.com";
  */
 const ATTRIBUTION_HEADERS = {
   "X-AIMLAPI-Source": "agent/hypit",
-  "X-AIMLAPI-Partner-ID": "part_PLACEHOLDER_HYPIT",
+  "X-AIMLAPI-Partner-ID": "part_BHmnXWonwB4u62dvr0r2G6Hr",
 } as const;
 
 export type CreateAimlapiProviderOptions = {
