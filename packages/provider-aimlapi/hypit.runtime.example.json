@@ -1,0 +1,18 @@
+{
+  "format": "hypit.runtime-local@1",
+  "dataRoot": ".hypit/execution",
+  "credentials": { "os": { "use": "@hypit/credential-store-os" } },
+  "endpoints": {
+    "aimlapi.personal": {
+      "use": "@hypit/provider-aimlapi",
+      "config": { "apiKey": { "store": "os", "key": "aimlapi.personal" } }
+    }
+  },
+  "bindings": {
+    "@hypit/gpt-image@1#gpt-image-2": "aimlapi.personal",
+    "@hypit/nano-banana@1#nano-banana-pro": "aimlapi.personal",
+    "@hypit/seedance@1#seedance-2": "aimlapi.personal",
+    "@hypit/minimax-h3@1#minimax-h3": "aimlapi.personal",
+    "@hypit/grok-imagine@1#grok-imagine-video": "aimlapi.personal"
+  }
+}
