@@ -2,6 +2,14 @@ import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from "n
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+/** Only absence is repairable by installing a package; malformed manifests and I/O errors are not. */
+export class NodePackageNotFoundError extends Error {
+  constructor(name: string) {
+    super(`cannot locate installed package ${name}`);
+    this.name = "NodePackageNotFoundError";
+  }
+}
+
 export type LocatedNodePackage = {
   readonly root: string;
   readonly manifest: {
@@ -81,8 +89,15 @@ export function declaredExternalPackageRoot(root: string, from: string | URL, na
   while (true) {
     const manifest = join(cursor, "package.json");
     if (existsSync(manifest)) {
-      const value = JSON.parse(readFileSync(manifest, "utf8")) as { dependencies?: Record<string, string> };
-      const version = value.dependencies?.[name];
+      const value = JSON.parse(readFileSync(manifest, "utf8")) as {
+        dependencies?: Record<string, string>;
+        optionalDependencies?: Record<string, string>;
+      };
+      // An upstream asset a package ships as optional is still selected by one exact version here.
+      // `hypit packages install` places it under the machine npm root named by this selection, so
+      // reading only the required map makes the documented repair unusable for every optional asset.
+      // npm lets optionalDependencies override dependencies with the same name.
+      const version = value.optionalDependencies?.[name] ?? value.dependencies?.[name];
       return version === undefined ? undefined : externalPackageInstallRoot(root, name, version);
     }
     const parent = dirname(cursor);
@@ -217,7 +232,7 @@ export function locateNodePackage(nameValue: string, options: LocateNodePackageO
       if (found !== undefined) return found;
     }
   }
-  throw new Error(`cannot locate installed package ${name}`);
+  throw new NodePackageNotFoundError(name);
 }
 
 function packageFile(

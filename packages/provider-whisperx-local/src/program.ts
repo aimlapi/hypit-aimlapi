@@ -52,6 +52,8 @@ export type LocalWhisperXProgramOptions = {
   readonly expectedServiceVersion: string;
   readonly expectedWhisperXVersion: string;
   readonly serviceCommand?: ManagedProgramCommand;
+  readonly alignmentLanguages?: readonly string[];
+  readonly modelCacheDirectory?: string;
 };
 
 export function localWhisperXProgram(options: LocalWhisperXProgramOptions): ManagedProgram {
@@ -85,11 +87,13 @@ export function localWhisperXProgram(options: LocalWhisperXProgramOptions): Mana
     HYPIT_WHISPERX_COMPUTE: expected.compute,
     HYPIT_WHISPERX_BATCH_SIZE: String(expected.batchSize),
     HYPIT_WHISPERX_NLTK_DATA: nltkData,
+    ...(options.modelCacheDirectory === undefined ? {} : { HYPIT_WHISPERX_MODEL_CACHE: options.modelCacheDirectory }),
+    HYPIT_WHISPERX_ALIGNMENT_LANGUAGES: (options.alignmentLanguages ?? []).join(" "),
   };
   const check: ManagedProgramCommand = {
     command: pythonEnvironmentCommand(environment, "hypit-whisperx-check"),
-    args: [],
-    env: { HYPIT_WHISPERX_NLTK_DATA: nltkData },
+    args: ["--models"],
+    env: serviceEnvironment,
   };
   const managedStart: ManagedProgramCommand = {
     command: pythonEnvironmentCommand(environment, "hypit-whisperx-service"),
@@ -126,13 +130,15 @@ export function localWhisperXProgram(options: LocalWhisperXProgramOptions): Mana
         probe: installationProbe,
         prepareBeforeStart: true,
         commands: [{
+          label: "Prepare the locked Python environment",
           command: "uv",
           args: ["sync", "--project", localWhisperXManagedProject, "--frozen", "--no-editable"],
           env: { UV_PROJECT_ENVIRONMENT: environment },
         }, {
+          label: `Prepare WhisperX ${expected.model} and alignment resources for ${(options.alignmentLanguages ?? []).join(", ") || "no selected languages"}`,
           command: pythonEnvironmentCommand(environment, "hypit-whisperx-prepare"),
           args: ["--nltk-data", nltkData],
-          env: { HYPIT_WHISPERX_NLTK_DATA: nltkData },
+          env: serviceEnvironment,
         }],
       },
     } : {}),

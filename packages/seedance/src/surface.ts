@@ -23,6 +23,7 @@ import type {
 import { createSeedanceAssembledGenerationFragment } from "./fragment.js";
 import { seedanceEndpoints, seedancePorts } from "./index.js";
 import type { SeedanceModel, SeedancePortMap } from "./index.js";
+import { validateSeedanceAudio } from "./validation.js";
 
 type MediaInput = {
   readonly port: "referenceImage" | "referenceVideo" | "referenceAudio" | "firstFrame" | "lastFrame";
@@ -109,6 +110,7 @@ function mediaReference(
   if (value !== undefined && (value.kind !== "blob" || !value.mediaType.startsWith(`${role}/`))) {
     throw new Error(`${subject} must reference ${role} media`);
   }
+  if (value?.kind === "blob" && role === "audio") validateSeedanceAudio(value, subject);
   return reference;
 }
 

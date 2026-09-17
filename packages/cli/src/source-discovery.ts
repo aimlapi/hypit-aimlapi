@@ -1,5 +1,5 @@
 import { readFile, realpath } from "node:fs/promises";
-import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 
 import { authorFrontendsFromHostFacets, prepareAuthorSource } from "@hypit/elaborator";
 import type { AuthorFrontend } from "@hypit/elaborator";
@@ -12,7 +12,7 @@ import { parseSourceHeader, sourceFrontendPackageAbi } from "@hypit/source";
 
 function isWithin(root: string, path: string): boolean {
   const relation = relative(root, path);
-  return relation === "" || (!relation.startsWith("..") && !isAbsolute(relation));
+  return relation === "" || (relation !== ".." && !relation.startsWith(`..${sep}`) && !isAbsolute(relation));
 }
 
 function selectedPackage(request: string): string {

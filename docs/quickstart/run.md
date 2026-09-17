@@ -252,7 +252,7 @@ credential references are present. Before `doctor` or a paid/external `build`, c
 credentials referenced by the selected Runtime Profile. First inspect the existing selection:
 
 ```bash
-hypit auth status
+hypit auth status hypihub.default
 ```
 
 If a needed service is not ready, choose whether to configure that service or another supported
@@ -299,31 +299,74 @@ within that agreement; pricing output and successful authentication are informat
 
 ## Build workflow
 
-Keep credentials, generated media, Runtime data and logs out of commits. A project may live anywhere:
+Keep credentials, generated media, Runtime data and logs out of commits.
+
+### 0. Prepare dependencies on demand
+
+Users do not run `pnpm install`. `runtime up` reads the selected Runtime Profile, installs the
+upstream npm packages its Adapters declare into a machine-shared directory, and prepares external
+programs. [`uv`](https://docs.astral.sh/uv/) is only needed first when the Profile selects local
+Python programs such as WhisperX or OpenCV.
+
+When an author package such as Fontsource is missing, `check`/`plan` report the precise command, for
+example:
+
+```bash
+hypit packages install @fontsource-variable/inter@5.3.0
+```
+
+`hypit runtime up` manages dependencies, the background Worker and external programs; `build` does
+not perform deployment preparation.
+
+#### Keeping a real video project outside the Hypit checkout
+
+Author files do not have to live under this repository. For example, a project in `/work/my-film`
+that reuses packages installed under `/opt/hypit`:
 
 ```bash
 cd /work/my-film
+
 hypit runtime use hypit.runtime.json
+hypit plan build.svrun
 ```
 
-The Workspace is resolved before the Runtime Profile. Override it explicitly with `--workspace`;
-the entry Source path and Runtime selection never choose it. `--package-root` locates installed packages and never widens Source access.
-`--asset-root` grants read access to additional asset bytes without permitting Source imports there.
+The Workspace is resolved before the Runtime Profile. Override it explicitly with `--workspace`; the
+entry Source path and Runtime selection never choose it. `--package-root` locates installed packages
+and never widens Source access; `--asset-root` only grants read access to additional asset bytes.
+
+An external project should normally commit this `.gitignore`:
 
 ```text
 .hypit/
-  results/
-    <UTC-date>/
-      <build-id>/
-        result.json
-        files/
-        values/
+output/
 ```
 
+The authoritative result of every Build lives in `.hypit/results/<UTC-date>/<build-id>/`:
+`result.json` records the name, status, Target and public Outputs, media in `files/`, structured
+values in `values/`.
+
 That is the zero-configuration Result repository. The `output/` directory shown earlier is only a
-convenient destination for explicit exports and is not part of Result storage. A project-owned `hypit.results.json` may instead select
-`@hypit/build-result-s3`; commands and historical `build-record` references then use that same
-repository. Temporary Resources remain local and private to the active Runtime.
+convenient destination for explicit exports and is not part of Result storage. A project-owned
+`hypit.results.json` may instead select `@hypit/build-result-s3`; commands and historical
+`build-record` references then use that same repository. Temporary Resources for an active Build
+remain local and private to the Runtime.
+
+Read-only archive commands such as `status` and `builds` do not initialize the Runtime database when
+state does not exist yet.
+
+A shared read-only asset library does not need to be copied into the project, nor does it widen the
+Source boundary:
+
+```bash
+hypit plan /work/my-film/build.svrun --asset-root /work/shared-media
+```
+
+`--asset-root` may be repeated and only grants read access to asset bytes; it never permits importing
+`.svml`/`.svs` Source from there. That Host option does not enter author or Build identity; what
+actually enters the graph are the explicit Resource values formed from those files.
+
+A Runtime Profile only selects the Credential Store, Endpoints and their closed configuration. The
+full structure is maintained in [Runtime](../guide/runtime.md), not duplicated in this Quickstart.
 
 ### 1. Select a Runtime
 

@@ -1,7 +1,4 @@
-import {
-  sealGenerationPortRequest,
-  sealGenerationPortTable,
-} from "@hypit/generation";
+import { sealGenerationPortTable } from "@hypit/generation";
 import type {
   GenerationPortTable,
   GenerationPortValue,
@@ -12,6 +9,7 @@ import type { SurfaceAttributeVocabulary, SurfacePortVocabulary } from "@hypit/m
 import { defineExactModelModule } from "@hypit/model-kit";
 import { textTypes } from "@hypit/text";
 import type { ResourceId } from "@hypit/protocol";
+import { validateSeedanceInputs } from "./validation.js";
 
 export const seedanceModuleRef = { name: "@hypit/seedance", version: "1" } as const;
 export const seedanceModels = ["seedance-2", "seedance-2-fast", "seedance-2-mini", "seedance-2.5"] as const;
@@ -93,7 +91,7 @@ export const seedancePorts: Readonly<Record<SeedanceModel, GenerationPortTable>>
 export type SeedancePortMap = Readonly<Record<string, readonly GenerationPortValue[]>>;
 
 export function sealSeedanceRequest(model: SeedanceModel, ports: SeedancePortMap): GenerationRequest {
-  return sealGenerationPortRequest(seedancePorts[model], ports);
+  return seedanceEndpointsByModel[model].sealRequest(ports);
 }
 
 const seedanceBaseDefinition = defineExactModelModule({
@@ -110,6 +108,7 @@ const seedanceBaseDefinition = defineExactModelModule({
       : `${model.split("-").map((part) => part[0]!.toUpperCase() + part.slice(1)).join("")}Request`,
     producerName: `request-${model}`,
     ports: seedancePorts[model],
+    validateInputs: validateSeedanceInputs,
   })),
 });
 
@@ -326,6 +325,7 @@ export const seedanceMarkupSurfaces = [
 
 /** The duration is an author literal on every Seedance Surface, so the manifest is the exact-model module's own. */
 export const seedanceManifest = seedanceBaseDefinition.manifest;
+
 export const seedanceComponent = seedanceBaseDefinition.component;
 export const seedanceDefinition = seedanceBaseDefinition;
 

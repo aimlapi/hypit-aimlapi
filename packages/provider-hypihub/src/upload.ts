@@ -2,6 +2,7 @@ import { requestDeadline } from "@hypit/runtime-kit";
 import { createHash } from "node:crypto";
 
 import type { HypiHubAuth } from "./oauth.js";
+import { HypiHubHttpError, HypiHubServiceError, safeHypiHubReason } from "./errors.js";
 
 type UploadAuth = HypiHubAuth | string;
 
@@ -45,12 +46,6 @@ function apiBaseUrl(value: string): string {
   const trimmed = value.trim().replace(/\/+$/u, "");
   assert(trimmed.length > 0, "HypiHub upload base URL is empty");
   return `${trimmed.replace(/\/(?:v1beta|v1)$/iu, "")}/v1`;
-}
-
-class HypiHubHTTPError extends Error {
-  constructor(readonly status: number, message: string, readonly retryAfterMs?: number, readonly code?: string) {
-    super(message);
-  }
 }
 
 export type HypiHubUploaderOptions = {
@@ -149,7 +144,7 @@ export class HypiHubUploader {
 
   private safeReason(error: unknown): string {
     const message = error instanceof Error ? error.message : String(error);
-    return message.replace(/https?:\/\/\S+/giu, "[redacted-url]").slice(0, 300);
+    return safeHypiHubReason(message);
   }
 
   private async json(path: string, auth: UploadAuth, init: RequestInit = {}): Promise<Record<string, unknown>> {
@@ -159,7 +154,7 @@ export class HypiHubUploader {
       try {
         return await this.jsonOnce(path, auth, init, Math.max(1, deadline - Date.now()));
       } catch (error) {
-        const http = error instanceof HypiHubHTTPError ? error : undefined;
+        const http = error instanceof HypiHubHttpError ? error : undefined;
         // Existing-session operations are idempotent. A new session may only
         // be retried after an explicit 429 rejection, never an unknown result.
         const retryable = http !== undefined
@@ -200,14 +195,9 @@ export class HypiHubUploader {
         if (response.ok) throw new Error(`HypiHub returned invalid JSON (${response.status})`);
       }
       if (!response.ok) {
-        const errorBody = body !== null && typeof body === "object" && "error" in body ? body.error : undefined;
-        const code = errorBody !== null && typeof errorBody === "object" && "code" in errorBody
-          && typeof errorBody.code === "string" ? errorBody.code : undefined;
-        const retryAfter = response.headers.get("retry-after");
-        const parsedRetry = retryAfter === null ? NaN : /^\d+$/u.test(retryAfter.trim())
-          ? Number(retryAfter) * 1000 : Date.parse(retryAfter) - Date.now();
-        throw new HypiHubHTTPError(response.status, `HypiHub returned HTTP ${response.status}: ${this.safeReason(text)}`,
-          Number.isFinite(parsedRetry) ? Math.max(0, parsedRetry) : undefined, code);
+        throw new HypiHubHttpError(response.status, response, text, {
+          method: init.method ?? "GET", url: `${this.baseUrl}${path}`,
+        });
       }
       return object(body, "HypiHub response");
     } finally {
@@ -365,12 +355,12 @@ export class HypiHubUploader {
       this.log(`multipart upload failed upload=${uploadId} reason=${this.safeReason(error)}`);
       try { await this.json(`/files/uploads/${encodeURIComponent(uploadId)}`, auth, { method: "DELETE" }); }
       catch (cancelError) {
-        if (!(cancelError instanceof HypiHubHTTPError && (cancelError.status === 404
+        if (!(cancelError instanceof HypiHubHttpError && (cancelError.status === 404
           || (cancelError.status === 409 && cancelError.code === "upload_completed")))) {
           this.log(`upload cancellation still pending upload=${uploadId} reason=${this.safeReason(cancelError)}`);
         }
       }
-      throw new Error(this.safeReason(error));
+      throw error instanceof HypiHubServiceError ? error : new Error(this.safeReason(error));
     }
   }
 

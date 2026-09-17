@@ -17,6 +17,6 @@
     "@hypit/studio-adapter": "workspace:*",
     "@hypit/fonts-open": "workspace:*",
     "@hypit/caption": "workspace:*",
-    "@hypit/timeline": "workspace:*"
+    "@hypit/temporal": "workspace:*"
   }
 }

@@ -1,4 +1,7 @@
 import { spawn } from "node:child_process";
+import { access, stat } from "node:fs/promises";
+import { constants } from "node:fs";
+import { delimiter, isAbsolute, resolve } from "node:path";
 
 type ProcessResult = {
   readonly stdout: Uint8Array;
@@ -13,8 +16,31 @@ export function positiveInteger(value: number, subject: string): number {
   return value;
 }
 
-function processEnvironment(): NodeJS.ProcessEnv {
-  const names = ["PATH", "HOME", "TMPDIR", "LANG", "LC_ALL"] as const;
+/** The engine's binary override requires a path; resolve our selected command without its fallback search. */
+export async function mediaExecutablePath(value: string): Promise<string> {
+  const pathLike = isAbsolute(value) || value.includes("/") || value.includes("\\");
+  const bases = pathLike ? [resolve(value)]
+    : (process.env.PATH ?? "").split(delimiter).filter(Boolean).map(directory => resolve(directory, value));
+  const extensions = process.platform === "win32" && !/\.[^\\/]+$/u.test(value) ? [".exe", ".com", ""] : [""];
+  for (const base of bases) for (const extension of extensions) {
+    const candidate = `${base}${extension}`;
+    try {
+      if (!(await stat(candidate)).isFile()) continue;
+      await access(candidate, process.platform === "win32" ? constants.F_OK : constants.X_OK);
+      return candidate;
+    } catch (error) {
+      if (!["ENOENT", "ENOTDIR", "EACCES"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error;
+    }
+  }
+  throw new Error(`HyperFrames media executable ${value} is unavailable; correct the Provider's ffmpegPath or ffprobePath.`);
+}
+
+export function processEnvironment(platform: NodeJS.Platform = process.platform): NodeJS.ProcessEnv {
+  // POSIX temp is TMPDIR; Windows is TEMP/TMP. HyperFrames writes extracted
+  // frames under %TEMP%\hf-render-… and ffmpeg creates temporary files the same way.
+  const names = platform === "win32"
+    ? ["PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "ComSpec", "TEMP", "TMP", "USERPROFILE", "LANG", "LC_ALL"] as const
+    : ["PATH", "HOME", "TMPDIR", "LANG", "LC_ALL"] as const;
   return Object.fromEntries(names.flatMap((name) => process.env[name] === undefined
     ? []
     : [[name, process.env[name]]])) as NodeJS.ProcessEnv;

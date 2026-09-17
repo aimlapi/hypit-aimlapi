@@ -6,7 +6,7 @@ import type { EndpointInvocationContext } from "@hypit/endpoint-kit";
 import { stageHyperframesProject } from "@hypit/hyperframes/project";
 import { sealRenderedVisual } from "@hypit/media";
 import type { MediaFrameRange, RenderedVisual } from "@hypit/media";
-import { verifyCompositableSurfaceBytes } from "@hypit/media-execution";
+import { verifyCompositableSurfaceFile } from "@hypit/media-execution";
 import { verifyHyperframesVisualRequest } from "@hypit/render-hyperframes";
 import type { HyperframesVisualRequest } from "@hypit/render-hyperframes";
 import { isStreamingResourceStore } from "@hypit/runtime";
@@ -15,6 +15,7 @@ import { assert, positiveInteger } from "./process.js";
 import { runCaptureProcess } from "./capture-process.js";
 import { finished } from "node:stream/promises";
 import { autoWorkerLimit } from "./concurrency.js";
+import { browserCacheDirectory, browserExecutablePath, configuredBrowserPath, requireBrowserExecutable, selectedBrowserVersion } from "./browser.js";
 
 export type HyperframesRenderProgress =
   | { readonly phase: "staging" | "encoding" | "storing"; readonly elapsedMs: number }
@@ -43,6 +44,9 @@ export function resolveExecutionOptions(options: HyperframesExecutionOptions) {
   const browserGpu = options.browserGpu ?? "hardware";
   assert(["auto", "software", "hardware"].includes(browserGpu), "HyperFrames browserGpu is invalid");
   return {
+    chromePath: configuredBrowserPath(options),
+    browserVersion: selectedBrowserVersion(options),
+    browserCacheDirectory: browserCacheDirectory(options),
     workers,
     maxWorkers: workers === "auto" ? positiveInteger(options.maxWorkers ?? autoWorkerLimit(), "maxWorkers") : workers,
     quality, browserGpu,
@@ -71,7 +75,7 @@ export async function renderHyperframesVisual(
   options: RenderHyperframesVisualOptions,
 ): Promise<RenderedVisual> {
   verifyHyperframesVisualRequest(request);
-  const config = resolveExecutionOptions(options);
+  const config = { ...resolveExecutionOptions(options), chromePath: browserExecutablePath(options) };
   const { document } = request;
   const range = request.range ?? { startFrame: 0, endFrameExclusive: document.frameCount };
   const frameCount = range.endFrameExclusive - range.startFrame;
@@ -97,8 +101,9 @@ export async function renderHyperframesVisual(
   };
   try {
     signal.throwIfAborted();
+    await requireBrowserExecutable(config.chromePath, config.browserVersion);
     await options.onDiagnostic?.({ level: "info", message:
-      `Render ${frameCount} frames; workers ${config.workers} (limit ${renderWorkerLimit(config, frameCount, document.frameRate.numerator / document.frameRate.denominator)}); opaque fast PNG; quality ${config.quality}; GPU ${config.browserGpu}; encoder ${config.ffmpegPath}` });
+      `Render ${frameCount} frames; workers ${config.workers} (limit ${renderWorkerLimit(config, frameCount, document.frameRate.numerator / document.frameRate.denominator)}); opaque fast PNG; quality ${config.quality}; GPU ${config.browserGpu}; browser ${config.chromePath}; encoder ${config.ffmpegPath}` });
     options.onProgress?.({ phase: "staging", elapsedMs: 0 });
     work = await mkdtemp(join(tmpdir(), "hypit-hyperframes-local-"));
     await stageHyperframesProject({ document, directory: work, signal,
@@ -109,7 +114,7 @@ export async function renderHyperframesVisual(
         assert(bytes !== undefined, `HyperFrames Artifact ${artifact.resource} is unavailable`);
         return bytes;
       },
-      validateSurface: (surface, bytes, probeSignal) => verifyCompositableSurfaceBytes({ surface, bytes,
+      validateSurface: (surface, path, probeSignal) => verifyCompositableSurfaceFile({ surface, path,
         ffprobePath: config.ffprobePath, processTimeoutMs: config.processTimeoutMs,
         maxProbeOutputBytes: config.maxProcessOutputBytes, signal: probeSignal! }),
     });

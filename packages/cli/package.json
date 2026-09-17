@@ -27,6 +27,7 @@
     "typescript": "5.9.3"
   },
   "devDependencies": {
+    "@hypit/runtime-local": "workspace:*",
     "@hypit/markup": "workspace:*",
     "@hypit/run-markup": "workspace:*",
     "@hypit/workspace-fs-node": "workspace:*"

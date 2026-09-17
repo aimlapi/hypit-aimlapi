@@ -31,6 +31,8 @@ class ServiceConfig:
     nltk_data_root: Path
     max_request_bytes: int
     max_audio_bytes: int
+    model_cache: Path | None
+    alignment_languages: tuple[str, ...]
 
     @classmethod
     def from_environment(cls, environment: Mapping[str, str] | None = None) -> "ServiceConfig":
@@ -57,7 +59,12 @@ class ServiceConfig:
         if not roots:
             raise ValueError("HYPIT_WHISPERX_INPUT_ROOTS must contain at least one path")
 
+        languages = tuple(dict.fromkeys(env.get("HYPIT_WHISPERX_ALIGNMENT_LANGUAGES", "").split()))
+        if any(not language.isascii() or not language.isalpha() or language != language.lower() for language in languages):
+            raise ValueError("HYPIT_WHISPERX_ALIGNMENT_LANGUAGES must contain lowercase language codes")
         return cls(
+            model_cache=Path(env["HYPIT_WHISPERX_MODEL_CACHE"]).expanduser().resolve() if env.get("HYPIT_WHISPERX_MODEL_CACHE") else None,
+            alignment_languages=languages,
             port=_positive_integer(env.get("HYPIT_WHISPERX_PORT", "8765"), "HYPIT_WHISPERX_PORT", 65535),
             model=model,
             device=device,

@@ -1,4 +1,4 @@
-import { relative, resolve } from "node:path";
+import { relative, resolve, sep } from "node:path";
 
 import type { CanonicalValue } from "@hypit/protocol";
 
@@ -279,7 +279,7 @@ function glyph(io: CliIo, unicode: string, ascii: string): string {
 function shortPath(path: string): string {
   const absolute = resolve(path);
   const local = relative(process.cwd(), absolute);
-  return local.length > 0 && !local.startsWith("..") ? local : absolute;
+  return local.length > 0 && local !== ".." && !local.startsWith(`..${sep}`) ? local : absolute;
 }
 
 function facts(rows: readonly (readonly [string, string])[], colors: Palette): string[] {
@@ -878,6 +878,7 @@ function commandHelp(topic: string, colors: Palette): readonly string[] | undefi
       colors.accent(colors.strong("hypit programs")),
       colors.dim("Prepare and operate external programs declared by Endpoints in one Runtime Profile."),
       "",
+      "  hypit programs prepare [--runtime <profile>] [--endpoint <instance>]  # resources only; does not start services",
       "  hypit programs up [--runtime <profile>] [--workspace <project>] [--max-wait-ms <ms>]",
       "  hypit programs status [--runtime <profile>] [--workspace <project>]",
       "  hypit programs down [--runtime <profile>] [--workspace <project>]",
@@ -971,6 +972,9 @@ function commandHelp(topic: string, colors: Palette): readonly string[] | undefi
       "  hypit auth login <endpoint-instance> [--runtime <profile>] [--slot <name>] [--from <secret-file>]",
       "  hypit auth logout <endpoint-instance> [--runtime <profile>] [--slot <name>]",
       "  All auth actions accept --workspace <project> to use that project's selection.",
+      "  status shows credential presence and the Provider's declared browser login, if any.",
+      "  login opens that browser flow or securely prompts for the secret; --from imports a secret instead.",
+      "  Configure the service's Endpoint first. Storing a key does not install a Provider or select bindings.",
     ],
   };
   const selected = topics[topic];
@@ -1011,7 +1015,7 @@ export function writeCliHelp(io: CliIo, topic?: string): void {
     row("doctor [profile]", "diagnose selected external setup"),
     row("runtime init|use|unset", "create or select this project's Runtime Profile"),
     row("runtime up|status|logs|down", "prepare and manage the local Build Runtime"),
-    row("programs up|status|down", "manage declared external programs only"),
+    row("programs prepare|up|status|down", "manage declared external programs only"),
     row("packages install|status", "manage pinned upstream packages in the machine home"),
     row("activity [--watch]", "show active Builds and their current phases"),
     row("cancel <build-id>", "withdraw one active Build"),

@@ -29,7 +29,7 @@
 <p align="center">
   <a href="https://hypit.ai"><img alt="Visit our website" src="https://img.shields.io/badge/Visit%20our%20website-DF3C68?style=for-the-badge&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjI1Ny4wMyAyODcuNDggNDg2Ljk0IDQyNi4wNCI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTczMy4wMDEsNDYyLjU5MmMtMTEuNDQtMTYuNTEtMzAuMjg1LTI2LjM0NC01MC4zNTMtMjYuMzQ0aC0xNzguNzA1Yy0yMy40OTMsMC00Ny42NzUsMTQuMjM0LTU2LjYyOCwzNS45NjdsLTU0LjA2NSwxNDUuMDUzYy04LjgsMjEuNTIzLTguNjg2LDQ2LjAxMSw0LjI0Nyw2NS4zNTIsMTIuOTksMTkuNDE4LDM3LjAzOCwzMC44OTcsNjAuMzk3LDMwLjg5N2gxNjQuNDljMjcuMDEzLDAsNTEuNDYzLTE2Ljk4OSw2MC45MTQtNDIuMjhsNTYuODAxLTE1Mi4yMjdjNy4wMjEtMTguODI1LDQuMzgxLTM5LjkwOC03LjA1OS01Ni4zOTl2LS4wMzhoLS4wMzh2LjAxOVpNNjMzLjk3OCw2NTIuODEzYy0xLjc5OCw0LjgyMS02LjQ4NSw4LjA3My0xMS42MzIsOC4wNzNoLTE1OS42NWMtOC4zMDMsMC0xMi43OC01LjM1Ny0xNC4zMjktNy42MzNzLTQuNzgzLTguNDc1LTEuNjA3LTE2LjE0N2w0NS42MjgtMTI2LjcyNWM0LjM4MS0xMi4xNDgsMTUuNDU4LTIwLjc5NiwyOC4zNTItMjEuNDY1LjYzMS0uMDM4LDEuMjgyLS4wMzgsMS45NTEtLjAzOGgxNDQuMjY5czIzLjkzMywyLjcxNywxNy43NzMsMjcuOTUxbC01MC43NTUsMTM2LjAwNGgwdi0uMDE5Wk0zNTYuMjUsNjIzLjEyMnMtNDIuNzc3LTIyLjE3My0zMy43ODYtNjIuNDgzbDU2Ljc2Mi0xNTcuMzE2YzkuMTQ1LTI1LjM0OSwzMy4yMTItNDIuMjYxLDYwLjE2OC00Mi4yNjFoMTgxLjc4NWMxMS45NTcsMCwyMy4xNDksNS43OTcsMzAuMDU1LDE1LjU3M2wyNi41NzMsMzcuNjVoLTIxNi4xMjVjLTE2LjY0NCwwLTMxLjU0NywxMC4zNS0zNy4zNDQsMjUuOTYxbC02OC4wODgsMTgyLjg5NWgwdi0uMDE5Wk0yOTIuMDY0LDU0OS41NDNzLTQyLjc5Ny0yMi4xNzMtMzMuNzg2LTYyLjQ4M2w1Ni43NjItMTU3LjMxNmM5LjE2NC0yNS4zNDksMzMuMjMxLTQyLjI2MSw2MC4xNjgtNDIuMjYxaDE3Mi4wMDljMTEuOTU3LDAsMjMuMTQ5LDUuNzk3LDMwLjA1NSwxNS41NzNsMjYuNTczLDM3LjY1aC0yMDYuMzExYy0xNi42NDQsMC0zMS41NDcsMTAuMzUtMzcuMzQ0LDI1Ljk2MWwtNjguMDg4LDE4Mi44OTVoLS4wMzh2LS4wMTlaIi8%2BPC9zdmc%2B"></a>
   <a href="https://discord.gg/85hnyQnxpn"><img alt="Join our Discord" src="https://img.shields.io/badge/Join%20our%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
-  <a href="https://t.me/hypit"><img alt="Join our Telegram" src="https://img.shields.io/badge/Join%20our%20Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white"></a>
+  <a href="https://t.me/hypitai"><img alt="Join our Telegram" src="https://img.shields.io/badge/Join%20our%20Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white"></a>
   <a href="https://x.com/hypitai"><img alt="Follow @hypitai on X" src="https://img.shields.io/badge/Follow%20%40hypitai-000000?style=for-the-badge&logo=x&logoColor=white"></a>
 </p>
 
@@ -41,7 +41,7 @@
 
 Hypit 为 AI Agent（Claude Code、Codex 等）提供了一套制作视频的语言和系统。给它一条视频，Agent 就能把它复刻成一份完整的 workflow：画面、字幕、B-roll、特效，全部锚定在词上，而不是秒上。
 
-**需要说明的是：** 复刻视频是最快的入口，但不是唯一的入口。你可以从我们的模板开始，也可以描述你想要的视频，让 Agent 从零写出一份 workflow。生成模型同样不是必需的：字幕、动效和代码渲染的画面，不调用任何模型也能编译成一条成片，一条视频的成本可以正好是 $0。
+**需要说明的是：** 复刻视频是最快的入口，但不是唯一的入口。你可以从我们的模板开始，也可以描述你想要的视频，让 Agent 从零写出一份 workflow。生成模型同样不是必需的：字幕、动效和代码渲染的画面，不调用生成模型也能编译成一条成片，因此可以不产生模型服务费用。
 
 ![SVML 源文件与实时视频预览](https://github.com/user-attachments/assets/981c28e8-ddab-4164-85bc-03b5d71275dc)
 
@@ -55,6 +55,13 @@ npx skills add hypit-ai/hypit -g
 
 这条命令安装 Skill。首次使用时，Agent 会检查 Hypit 可执行程序，并按需协助安装。
 视频项目可以放在任意位置。
+
+Hypit 本身免费使用；Coding Agent 和模型服务各有自己的账号与费用。
+HypiHub 是我们推荐的托管模型服务，也可以使用你自己的 API 或本地模型。
+把服务名称和 API 文档告诉 Agent，它会据此配置合适的连接。
+
+[Agent 工作环境与入口合作方](./docs/zh/guide/agents.md) ·
+[模型与部署服务](./docs/zh/guide/service-partners.md)
 
 ## 示例
 
@@ -129,7 +136,7 @@ npx skills add hypit-ai/hypit -g
 编程 Agent 可以直接使用 `/hypit` skill。在任意空目录或现有项目目录中开启会话，让 Agent 为你创建视频：
 
 ```text
-/hypit 复刻这个视频：/path/to/video
+/hypit 复刻这个视频：/path/to/video.mp4，把排行榜内容换成 Hypit（官网：hypit.ai）与其他 AI 视频产品的对比。
 ```
 
 也可以不提供参考视频，直接从描述开始：
@@ -145,9 +152,9 @@ Agent 会检查环境，索要这条视频需要的凭据，生成素材并构�
 ## 为什么选择 Hypit
 
 - **真的能 Clone：** 丢一条视频进来，拿到整份 workflow —— 画面、字幕、B-roll、特效。不是拆解脚本。
-- **一份 workflow，100 个变体：** 第二条几乎不花钱，第一百条只是跑个循环。
+- **一份 workflow，100 个变体：** 复用编排和已有素材，需要变化的部分再生成。
 - **可插拔组件：** 换主播不动字幕。用组件库、fork 一个，或自己写。
-- **开源，一条视频 0 元：** 不按人头收费，不按条收费，没有水印。Arcads 每月 220 美元，Creatify 39 美元，而这是你还没渲染任何东西之前 —— 但 Hypit 是 0 元。
+- **开源：** Hypit 不按人头或渲染次数收费，也不添加水印。模型服务费用由你选择的服务方收取。
 
 ## Hypit 能构建什么
 
@@ -158,7 +165,7 @@ Agent 会检查环境，索要这条视频需要的凭据，生成素材并构�
 - **带货视频** —— 一个跑通的格式，每天换一个 SKU。换产品、换价格、换 CTA，转化率跑出来的结构原封不动。
 - **AI UGC 与口播** —— 配音、词级字幕、B-roll、评论区贴纸、卡点剪辑，全部自动挂好。
 - **播客与采访切片** —— 分屏布局、区分说话人的字幕、反应特效。
-- **代码渲染的视频** —— 画面完全由前端代码驱动。全部由源码编译，零 API 调用，一条 0 元。
+- **代码渲染的视频** —— 画面完全由前端代码驱动，本地渲染，无需调用生成模型 API。
 - **多语言版本** —— 同一条视频十种语言。改一句台词，时间轴自己重排。
 
 ## 关注我们
@@ -178,17 +185,99 @@ Agent 会检查环境，索要这条视频需要的凭据，生成素材并构�
 <table>
   <tr>
     <td>缺陷报告</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?labels=bug">提交 issue</a></td>
+    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=bug_report.yml">提交 issue</a></td>
   </tr>
   <tr>
     <td>功能请求</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?labels=enhancement">提交 issue</a></td>
+    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=feature_request.yml">提交 issue</a></td>
   </tr>
   <tr>
     <td>问题咨询</td>
-    <td><a href="https://discord.gg/85hnyQnxpn">Discord</a> 或 <a href="https://t.me/hypit">Telegram</a></td>
+    <td><a href="https://discord.gg/85hnyQnxpn">Discord</a> 或 <a href="https://t.me/hypitai">Telegram</a></td>
   </tr>
 </table>
+
+扫码加入 Hypit 微信群：
+
+<img alt="扫码加入 Hypit 微信群" src="./docs/public/wechat-group.jpg" width="320">
+
+## Launch 伙伴
+
+<table>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://watcha.cn">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/watcha-dark.png">
+          <img alt="观猹" src="./docs/public/watcha-light.png" width="170">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://watcha.cn">观猹</a>是一个专为 AI 开发者打造的创新产品生态与社区，致力于连接优秀产品与高质量用户，助力每一个想法从 Demo 走向真实落地。从产品发现与真实反馈起步，观猹提供发布、分发与声誉追踪等支持，全方位陪伴开发者完成从产品上线到首批用户获取的全过程。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://tokendance.space/?utm_source=hypit">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/tokendance-dark.png">
+          <img alt="TokenDance" src="./docs/public/tokendance-light.png" width="165">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://tokendance.space/?utm_source=hypit">TokenDance</a> 为开发者提供优化了推理成本的统一多模型网关。通过百亿 Token 补贴和开发者计划，TokenDance 帮助早期开发者大幅降低成本，更专注于产品验证与业务增长。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://autoclaw.zhipuai.cn/"><img alt="AutoClaw" src="./docs/public/autoclaw.png" width="180"></a>
+    </td>
+    <td><a href="https://autoclaw.zhipuai.cn/">AutoClaw</a> 是智谱推出的桌面端 AI 工作助手，深度适配 GLM 模型，融合法律、金融、设计等领域的专属知识库与工作流。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://openagents.org/blog/posts/2026-09-08-pilot-user-program-zh-hypit"><img alt="OpenAgents" src="./docs/public/openagents.png" width="180"></a>
+    </td>
+    <td><a href="https://openagents.org">OpenAgents Workspace</a> 是一个让你管理智能体的产品，它能让你随时随地调用在任何设备上运行的 Agent（手机 + 电脑端均可）。Agents 可以在其中协同合作，帮你完成任务、提升效率。现支持 Claude、Codex、Openclaw、Hermes 等 20 余种 agent 接入。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://monid.ai?fpr=alvin-45480b">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/monid-logo-white.svg">
+          <img alt="Monid" src="./docs/public/monid-logo-blue.svg" width="150">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://monid.ai?fpr=alvin-45480b">Monid</a> 是 Agent 工具的 OpenRouter：一个 key、一个钱包、数百种工具，按调用计费。Hypit 可以把 Seedance 的视频、图像、语音和词级转写路由到 Monid。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://www.hiapi.ai/invite/hypit"><img alt="HiAPI" src="./docs/public/hiapi.png" width="165"></a>
+    </td>
+    <td><a href="https://www.hiapi.ai/invite/hypit">HiAPI</a> 是一个统一的 AI 图片、视频、音频和语言模型 API 平台，支持 GPT Image 2.5、Seedance 2.0、Veo 3.1、可灵、万相等主流模型。HiAPI 提供在线 Playground、Remote MCP 和 Agent Skills，可接入 Claude Code、Cursor 等 AI 编程工具。平台按量付费，无月费，新用户注册可获得免费体验积分。</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://api.pollo.ai/?utm_source=hypit"><img alt="Pollo API" src="./docs/public/pollo.jpg" width="120"></a>
+    </td>
+    <td><a href="https://api.pollo.ai/?utm_source=hypit">Pollo API</a> 通过单个 API 为开发者提供 300 多个 AI 图片与视频模型，价格具备竞争力。一个 API key 即可接入多家模型服务商，请求规模从 10 次到 10000 次以上均可承载。</td>
+  </tr>
+</table>
+
+## ⭐ Star History
+
+<a href="https://www.star-history.com/?repos=hypit-ai%2Fhypit&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&theme=dark&logscale&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
+ </picture>
+</a>
+
+## 贡献者
+
+<a href="https://github.com/hypit-ai/hypit/graphs/contributors">
+  <img alt="Contributors" src="https://contrib.rocks/image?repo=hypit-ai/hypit">
+</a>
 
 ## 许可证
 

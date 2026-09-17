@@ -41,7 +41,7 @@
 
 Hypit gives AI agents (Claude Code, Codex...) a language and system to create video. Drop in a video, and your agent clones it as a complete workflow: footage, captions, B-roll and effects, all anchored to words instead of seconds.
 
-**To be clear:** cloning a video is the fastest way in, not the only one. You can start from our templates, or just describe the video you want and your agent writes the workflow from scratch. Generation models are optional too: a workflow can compile captions, motion graphics and code-rendered visuals into a finished video without calling a single model, so a video can cost exactly $0.
+**To be clear:** cloning a video is the fastest way in, not the only one. You can start from our templates, or just describe the video you want and your agent writes the workflow from scratch. Generation models are optional too: a workflow can compile captions, motion graphics and code-rendered visuals into a finished video without calling a generation model or incurring its service charges.
 
 ![SVML source and live video preview](https://github.com/user-attachments/assets/981c28e8-ddab-4164-85bc-03b5d71275dc)
 
@@ -55,6 +55,13 @@ npx skills add hypit-ai/hypit -g
 
 This installs the Skill. On first use, your agent checks for the Hypit executable and helps prepare
 it if needed. Your video project can live anywhere.
+
+Hypit is free to use; your Coding Agent and model services have their own accounts and charges.
+HypiHub is our recommended hosted model service. You can also use your own API or local models;
+tell your agent the service name and API documentation so it can set up the appropriate connection.
+
+[Agent environments and entry partners](./docs/guide/agents.md) ·
+[Model and deployment services](./docs/guide/service-partners.md)
 
 ## Examples
 
@@ -130,7 +137,7 @@ The `/hypit` skill is available to coding agents. Start a session in any empty o
 directory and ask it to create videos for you:
 
 ```text
-/hypit Clone this video: /path/to/video
+/hypit Clone this video: /path/to/video.mp4, and replace the ranking content with a comparison of Hypit (official website: hypit.ai) with other AI video products.
 ```
 
 Or start without a reference video:
@@ -146,9 +153,9 @@ Your agent can check the environment, request the credentials the video needs, g
 ## Why Hypit
 
 - **Clone any video:** drop in a video, get the whole workflow — footage, captions, B-roll, effects. Not a script breakdown.
-- **One workflow, 100 variants:** the second video costs almost nothing; the hundredth is a loop.
+- **One workflow, 100 variants:** reuse the composition and existing material; generate the parts that change.
 - **Pluggable components:** swap the host without touching the captions. Use the library, fork it, or write your own.
-- **Open source, $0:** no seat pricing, no per-render fees, no watermark. Arcads charges $220/mo, Creatify $39, before you render anything — but Hypit is $0.
+- **Open source:** no Hypit seat pricing, per-render fees or added watermark. Model-service usage is billed by the service you choose.
 
 ## What Hypit Can Build
 
@@ -159,7 +166,7 @@ Drop in a video and your agent clones the whole workflow — or describe what yo
 - **TikTok Shop and affiliate videos** — one format that converts, a new SKU every day. Swap the product, the price, the CTA; the structure that worked stays untouched.
 - **AI UGC and talking heads** — narration, word-level captions, B-roll, comment stickers, beat-synced cuts, all wired automatically.
 - **Podcast and interview clips** — split-screen layouts, speaker-aware captions, reaction overlays.
-- **Code-rendered videos** — visuals driven entirely by front-end code. Compiled from source, zero API calls, 0 dollars a video.
+- **Code-rendered videos** — visuals driven entirely by front-end code, rendered locally without generation API calls.
 - **Localized versions** — the same video in ten languages. Rewrite a line and the timing re-flows itself.
 
 ## Stay Tuned with Us
@@ -186,17 +193,95 @@ commands and the repository layout.
 <table>
   <tr>
     <td>Bug reports</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?labels=bug">Open an issue</a></td>
+    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=bug_report.yml">Open an issue</a></td>
   </tr>
   <tr>
     <td>Feature requests</td>
-    <td><a href="https://github.com/hypit-ai/hypit/issues/new?labels=enhancement">Open an issue</a></td>
+    <td><a href="https://github.com/hypit-ai/hypit/issues/new?template=feature_request.yml">Open an issue</a></td>
   </tr>
   <tr>
     <td>Questions</td>
-    <td><a href="https://discord.gg/85hnyQnxpn">Discord</a> or <a href="https://t.me/hypit">Telegram</a></td>
+    <td><a href="https://discord.gg/85hnyQnxpn">Discord</a> or <a href="https://t.me/hypitai">Telegram</a></td>
   </tr>
 </table>
+
+## Launch Partner
+
+<table>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://watcha.cn">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/watcha-dark.png">
+          <img alt="Watcha" src="./docs/public/watcha-light.png" width="170">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://watcha.cn">Watcha</a> is an innovative ecosystem and community built for AI builders, connecting great products with high-quality users to turn every Demo into reality. Starting from AI product discovery and genuine feedback, Watcha provides product publishing, distribution, and reputation tracking to support builders from launch to early adoption.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://tokendance.space/?utm_source=hypit">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/tokendance-dark.png">
+          <img alt="TokenDance" src="./docs/public/tokendance-light.png" width="165">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://tokendance.space/?utm_source=hypit">TokenDance</a> offers builders a unified multi-model gateway with optimized inference costs. Through programs like the Billion-Token Subsidy and the Developer Program, TokenDance helps early-stage builders cut costs so they can focus on product validation and growth.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://autoclaw.z.ai"><img alt="AutoClaw" src="./docs/public/autoclaw.png" width="180"></a>
+    </td>
+    <td><a href="https://autoclaw.z.ai">AutoClaw</a> is Z.ai’s desktop AI assistant for work, deeply optimized for GLM models and integrated with specialized knowledge bases and workflows for legal, finance, design, and more.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://openagents.org/blog/posts/2026-09-08-pilot-user-program-zh-hypit"><img alt="OpenAgents" src="./docs/public/openagents.png" width="180"></a>
+    </td>
+    <td><a href="https://openagents.org">OpenAgents Workspace</a> is a product that helps you manage AI agents, allowing you to invoke agents running on any device (whether on a mobile phone or computer) anytime, anywhere. Agents can collaborate within the platform to help you complete tasks and boost efficiency. It currently supports integration with over 20 types of agents, including Claude, Codex, OpenClaw, and Hermes.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://monid.ai?fpr=alvin-45480b">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="./docs/public/monid-logo-white.svg">
+          <img alt="Monid" src="./docs/public/monid-logo-blue.svg" width="150">
+        </picture>
+      </a>
+    </td>
+    <td><a href="https://monid.ai?fpr=alvin-45480b">Monid</a> is the OpenRouter for agent tools: one key, one wallet, hundreds of tools, billed per call. Hypit can route Seedance video, images, speech and word-level transcription to Monid.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://www.hiapi.ai/invite/hypit"><img alt="HiAPI" src="./docs/public/hiapi.png" width="165"></a>
+    </td>
+    <td><a href="https://www.hiapi.ai/invite/hypit">HiAPI</a> is a unified API platform for AI image, video, audio, and language models. Connect GPT Image 2.5, Seedance 2.0, Veo 3.1, Kling, Wan, and other popular models through one platform. Pay as you go with no monthly fee, with free trial credits available for new users.</td>
+  </tr>
+  <tr>
+    <td width="220" align="center">
+      <a href="https://api.pollo.ai/?utm_source=hypit"><img alt="Pollo API" src="./docs/public/pollo.jpg" width="120"></a>
+    </td>
+    <td><a href="https://api.pollo.ai/?utm_source=hypit">Pollo API</a> gives developers access to 300+ AI image and video models through a single API, with competitive rates. One API key connects you to multiple model providers and scales from 10 to 10,000+ requests.</td>
+  </tr>
+</table>
+
+## ⭐ Star History
+
+<a href="https://www.star-history.com/?repos=hypit-ai%2Fhypit&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&theme=dark&logscale&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=hypit-ai/hypit&type=date&logscale&legend=top-left" />
+ </picture>
+</a>
+
+## Contributors
+
+<a href="https://github.com/hypit-ai/hypit/graphs/contributors">
+  <img alt="Contributors" src="https://contrib.rocks/image?repo=hypit-ai/hypit">
+</a>
 
 ## License
 

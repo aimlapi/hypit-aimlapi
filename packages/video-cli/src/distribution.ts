@@ -12,8 +12,7 @@ import {
 
 // The Distribution root is the replaceable Hypit tool checkout, not this
 // package's source directory and never the author's project.
-const packageRoot = resolve(process.env.HYPIT_DISTRIBUTION_ROOT ?? resolve(import.meta.dirname, "../../.."));
-const installedLauncher = process.env.HYPIT_CLI_LAUNCHER;
+const packageRoot = resolve(import.meta.dirname, "../../..");
 const defaultBuildResultRepository = {
   use: "@hypit/build-result-fs",
   config: { path: ".hypit/results" },
@@ -26,15 +25,18 @@ export const videoCliDistribution: CliDistribution = {
   initialRuntimeProfile: {
     format: "hypit.runtime-local@1",
     dataRoot: ".hypit/runtimes/local",
+    // The starter selects the portable Store, so the Profile it writes is openable and writable on
+    // Linux as well: macOS and Windows keep the platform locker, and a Linux host uses an
+    // owner-private file. `os` and `file` stay selectable by name for one explicit backend.
     credentials: {
-      os: { use: "@hypit/credential-store-os" },
+      platform: { use: "@hypit/credential-store-platform" },
     },
     endpoints: {
       "hypihub.default": {
         use: "@hypit/provider-hypihub",
         config: {
           baseUrl: "https://hypit.ai",
-          apiKey: { store: "os", key: "hypihub.oauth" },
+          apiKey: { store: "platform", key: "hypihub.oauth" },
         },
       },
       "media.local": {
@@ -57,14 +59,8 @@ export const videoCliDistribution: CliDistribution = {
       : { distributionPackageRoot: options.distributionPackageRoot }),
     workerLaunch: {
       command: process.execPath,
-      // The repository launcher registers TypeScript support before entering the CLI.
-      // Tests that import this Distribution directly keep the current Node arguments.
-      args: installedLauncher === undefined
-        ? [
-            ...process.execArgv.filter((item) => !item.startsWith("--test")),
-            fileURLToPath(new URL("./cli.ts", import.meta.url)),
-          ]
-        : [installedLauncher],
+      // The loaded Distribution owns its Worker entry and TypeScript/package resolution.
+      args: [fileURLToPath(new URL("../../../bin/hypit.mjs", import.meta.url))],
     },
   }),
   openProjectResults: async (projectRoot, options) => {

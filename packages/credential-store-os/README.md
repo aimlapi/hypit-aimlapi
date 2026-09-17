@@ -11,3 +11,7 @@ bytes do not appear in command arguments or temporary files.
 
 Use `hypit auth login <endpoint> --runtime <profile>` to write the selected credential and
 `hypit auth logout` to remove it.
+
+A Profile that must also run on Linux can select `@hypit/credential-store-platform`:
+that package uses this Store on macOS and Windows, and an unencrypted, owner-private file on Linux.
+Selecting `@hypit/credential-store-os` directly continues to require macOS or Windows.

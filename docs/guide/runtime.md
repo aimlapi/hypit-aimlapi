@@ -73,12 +73,22 @@ request does not silently select another account. Read the chosen Provider's REA
 
 ## Prepare only the services needed now
 
+For local media processing, prepare the selected tools and start the Worker:
+
 ```bash
-hypit auth status
-hypit doctor --endpoint media.local
 hypit runtime up --endpoint media.local
 hypit runtime status
 ```
+
+To prepare resources without starting a helper or Worker, use
+`hypit programs prepare --endpoint media.local`. Inspect their readiness with
+`hypit programs status --endpoint media.local`; use `hypit doctor --endpoint media.local` when
+checking a configuration or diagnosing a failure. These are available tools, not a required sequence.
+
+Local media processing declares no credentials. For a chosen service that declares credential slots,
+inspect those separately with `hypit auth status <endpoint>`. For example, after choosing HypiHub,
+use `hypit auth status hypihub.default` and connect the account with `hypit auth login hypihub.default`
+when needed.
 
 Use the actual Endpoint names from the Profile; repeat `--endpoint` for several. Omission covers the
 whole Profile. `doctor` reads configuration and performs the selected Providers' diagnostics without
@@ -86,7 +96,7 @@ submitting generation. Read warnings as well as errors: a stored credential or r
 is not proof that every request will succeed. With no Runtime selected, doctor checks project Results only.
 
 `runtime up` prepares the selected local dependencies and Managed Programs, then starts the Worker.
-It does not log into or start hosted services. `programs up|status|down` manages those local helpers
+It does not log into or start hosted services. `programs prepare|up|status|down` manages those local resources and helpers
 separately. Initial inference setup can require substantial downloads; compare that effort with hosted
 execution and choose the route before starting preparation.
 

@@ -69,40 +69,7 @@ jobs:
 
   package:
     needs: [version, checks]
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ needs.version.outputs.version }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-      - run: pnpm install --frozen-lockfile
-      - name: Build the npm package and README
-        run: npm run pack:distribution
-      - name: Check the packaged CLI
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-        run: |
-          npm install --prefix "$RUNNER_TEMP/hypit-install" "$PWD/dist/release/hypit-hypit-$VERSION.tgz" --no-audit --no-fund
-          "$RUNNER_TEMP/hypit-install/node_modules/.bin/hypit" --version
-          "$RUNNER_TEMP/hypit-install/node_modules/.bin/hypit" studio --help
-      - uses: actions/upload-artifact@v4
-        with:
-          name: npm-package
-          path: |
-            dist/release/*.tgz
-            dist/release/README.md
-          if-no-files-found: error
-      - name: Record the release inputs
-        env:
-          VERSION: ${{ needs.version.outputs.version }}
-        run: |
-          echo "Prepared @hypit/hypit@$VERSION from $GITHUB_SHA. Download npm-package to inspect the tarball and README." >> "$GITHUB_STEP_SUMMARY"
+    uses: ./.github/workflows/npm-package.yml
 
   publish:
     if: github.event_name == 'release' || inputs.publish

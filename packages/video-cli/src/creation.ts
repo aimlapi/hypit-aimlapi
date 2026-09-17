@@ -21,7 +21,7 @@ import { speechEvidenceTypes } from "@hypit/speech-evidence";
 import type { AlignedTranscriptEvidence } from "@hypit/speech-evidence";
 import { sealText } from "@hypit/text";
 import { whisperXCapabilities, whisperXRequestForEvidenceAudio } from "@hypit/whisperx";
-import type { WhisperXLanguage } from "@hypit/whisperx";
+import { parseWhisperXLanguage } from "@hypit/whisperx";
 
 import { videoCliDistribution } from "./distribution.js";
 import { runProcess } from "./process.js";
@@ -159,9 +159,14 @@ async function selectedProvider(host: CreationHost, need: Need, profile: string)
   }]);
   const subject = capabilityName(need.capability);
   assert(provider !== undefined && provider.status !== "unresolved",
-    `No Endpoint in ${profile} serves ${subject}; hypit plan --runtime ${profile} shows which Endpoint each capability needs`);
+    `No Endpoint in ${profile} serves ${subject}; configure an Endpoint that supports this capability and check its binding in that Profile`);
   assert(provider.status !== "ambiguous",
-    `Several Endpoints in ${profile} serve ${subject}: ${(provider.endpoints ?? []).join(", ")}; keep exactly one`);
+    `Several Endpoints in ${profile} serve ${subject}: ${(provider.endpoints ?? []).join(", ")}; select one with bindings[${JSON.stringify(subject)}] in that Profile`);
+  assert(provider.status !== "unsupported",
+    `The configured Endpoints in ${profile} do not support this request for ${subject}`
+    + (provider.binding === undefined ? "" : ` (binding: ${provider.binding})`)
+    + `: ${(provider.rejections ?? []).map((item) => `${item.endpoint}: ${item.message}`).join("; ") || "no support reason supplied"}`
+    + "; adjust the request or select a compatible Endpoint in that Profile");
   return provider;
 }
 
@@ -277,9 +282,7 @@ async function transcribe(argv: readonly string[], io: CliIo, environment: Creat
   const parsed = parseArguments(argv, ["--language", "--to", "--runtime", "--workspace"]);
   assert(parsed.positionals.length === 1, "transcribe takes exactly one audio or video file");
   const source = resolve(environment.cwd, parsed.positionals[0]!);
-  const language = parsed.options.get("--language");
-  assert(language === "en" || language === "zh" || language === "es",
-    "transcribe requires --language en|zh|es for the spoken language (use --language zh for Chinese)");
+  const language = parseWhisperXLanguage(parsed.options.get("--language"), "transcribe --language");
   const to = await destination(parsed, environment.cwd);
   const { profile, host } = await environment.openHost(
     parsed.options.get("--runtime"),
@@ -293,7 +296,7 @@ async function transcribe(argv: readonly string[], io: CliIo, environment: Creat
     id: "need:hypit-transcribe",
     capability: whisperXCapabilities.alignment,
     returns: speechEvidenceTypes.alignedTranscript,
-    constraints: whisperXRequestForEvidenceAudio(audio, { language: language as WhisperXLanguage }),
+    constraints: whisperXRequestForEvidenceAudio(audio, { language }),
     result: "record:hypit-transcribe",
   };
   const provider = await selectedProvider(host, need, profile);
@@ -432,7 +435,7 @@ export function writeCreationHelp(io: CliIo, topic?: CreationCommand): void {
       "hypit transcribe",
       "Establish word times with the whisperx-alignment Endpoint of the selected Runtime Profile.",
       "",
-      "  hypit transcribe <audio|video> --to <transcript.json> --language en|zh|es [--runtime <profile>] [--workspace <project>]",
+      "  hypit transcribe <audio|video> --to <transcript.json> --language <code> [--runtime <profile>] [--workspace <project>]",
       "",
       "Extracts 16 kHz mono speech audio with ffmpeg and writes every word with its start and end in",
       "seconds. One immediate request; no Build, Result or state.",

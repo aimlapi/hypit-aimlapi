@@ -70,15 +70,18 @@ export type BuildView = {
   }[];
 };
 
-export type RuntimeHostCredentialStatus = {
+export type RuntimeHostCredentialDescription = {
   readonly endpoint: string;
   readonly slot: string;
   readonly label: string;
   readonly kind: "secret" | "json";
   readonly ref: CredentialRef;
   readonly acquisition?: CredentialAcquisition;
-  readonly configured: boolean;
   readonly writable: boolean;
+};
+
+export type RuntimeHostCredentialStatus = RuntimeHostCredentialDescription & {
+  readonly configured: boolean;
 };
 
 export type RuntimeHostControl = {
@@ -105,6 +108,8 @@ export type RuntimeHostResultControl = {
 };
 
 export type RuntimeHostCredentialControl = {
+  /** Endpoint declarations and Store write capability; never reads an existing secret. */
+  describeCredentials(endpoint?: string): Promise<readonly RuntimeHostCredentialDescription[]>;
   credentials(endpoint?: string): Promise<readonly RuntimeHostCredentialStatus[]>;
   putCredential(endpoint: string, slot: string, secret: string): Promise<RuntimeHostCredentialStatus>;
   deleteCredential(endpoint: string, slot: string): Promise<{
@@ -203,6 +208,8 @@ export type RuntimeHostProviderQuery = {
 export type ManagedProgramProgress = {
   readonly id: string;
   readonly phase: "checking" | "installing" | "starting" | "waiting" | "ready";
+  readonly logPath?: string;
+  readonly detail?: string;
 };
 
 export type ManagedProgramReport = {
@@ -215,6 +222,8 @@ export type ManagedProgramReport = {
     | { readonly state: "mismatch"; readonly detail: string };
   readonly detail?: string;
   readonly logPath?: string;
+  readonly installationLogPath?: string;
+  readonly errorLogPath?: string;
   readonly pid?: number;
 };
 
@@ -236,6 +245,7 @@ export type RuntimeController = {
     down(options?: { readonly maxWaitMs?: number }): Promise<RuntimeWorkerState>;
   };
   readonly programs: {
+    prepare(options?: { readonly endpoints?: readonly string[]; readonly onProgress?: (event: ManagedProgramProgress) => void }): Promise<{ readonly dataRoot: string; readonly programs: readonly ManagedProgramReport[] }>;
     up(options: {
       readonly maxWaitMs?: number;
       readonly onProgress?: (event: ManagedProgramProgress) => void;

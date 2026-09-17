@@ -55,7 +55,8 @@ test("a render deadline cancels resource preparation and awaits the reader's cle
   }
   const resources = new StalledResources();
   const document = documentFor({ kind: "blob", resource: "res_waiting", size: 1, mediaType: "video/mp4" });
-  await assert.rejects(renderHyperframesVisual({ document }, { resources, processTimeoutMs: 100 }),
+  // This test stops during resource preparation, before any browser is launched.
+  await assert.rejects(renderHyperframesVisual({ document }, { resources, chromePath: process.execPath, processTimeoutMs: 100 }),
     /render timed out during preparing resources/u);
   assert.equal(resources.active, 0, "the failed render must not leave its reader running");
 });
@@ -89,8 +90,16 @@ test("source selection retains loop, hold and fractional-speed sampling and shar
 
 test("real selected renders sample video correctly across loop, hold and stretch with independent browsers", {
   skip: process.env.HYPIT_BROWSER_TESTS !== "1",
-}, async () => {
+}, async (t) => {
   const root = await mkdtemp(join(tmpdir(), "hypit-render-range-test-"));
+  const saved = [process.env.HYPERFRAMES_FFMPEG_PATH, process.env.HYPERFRAMES_FFPROBE_PATH];
+  process.env.HYPERFRAMES_FFMPEG_PATH = join(root, "unselected-ffmpeg");
+  process.env.HYPERFRAMES_FFPROBE_PATH = join(root, "unselected-ffprobe");
+  t.after(() => {
+    for (const [index, key] of ["HYPERFRAMES_FFMPEG_PATH", "HYPERFRAMES_FFPROBE_PATH"].entries()) {
+      if (saved[index] === undefined) delete process.env[key]; else process.env[key] = saved[index];
+    }
+  });
   try {
     const colors = [[240, 20, 20], [20, 220, 20], [20, 20, 240], [220, 220, 20]];
     const raw = Buffer.concat(colors.map((color) => Buffer.from(Array.from({ length: 64 * 64 }, () => color).flat())));
@@ -103,8 +112,11 @@ test("real selected renders sample video correctly across loop, hold and stretch
     const events: HyperframesRenderProgress[] = [];
     const render = async (name: string, range: { startFrame: number; endFrameExclusive: number } | undefined,
       workers: number) => {
+      const warnings: string[] = [];
       const visual = await renderHyperframesVisual({ document, ...(range === undefined ? {} : { range }) },
-        { resources, workers, quality: "high", processTimeoutMs: 120000, onProgress: (e) => events.push(e) });
+        { resources, workers, quality: "high", processTimeoutMs: 120000, onProgress: (e) => events.push(e),
+          onDiagnostic: async (event) => { if (event.level === "warning") warnings.push(event.message); } });
+      assert.deepEqual(warnings, [], "a completed render should close its resources and exit without forced cleanup");
       const file = join(root, `${name}.mp4`);
       await writeFile(file, (await resources.get(visual.artifact.resource))!);
       const decoded = spawnSync("ffmpeg", ["-v", "error", "-i", file, "-f", "rawvideo", "-pix_fmt", "rgb24", "pipe:1"]);

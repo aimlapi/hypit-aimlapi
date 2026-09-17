@@ -177,8 +177,8 @@ test("pricing presents Provider-owned material beside the corresponding Needs", 
       endpoint: "hypihub.default", use: "@hypit/provider-hypihub",
       pricing: { kind: "page", url: "https://hypit.ai/commercial/pricing/" },
       pricingDocuments: [{
-        source: "https://hypit.ai/v1/pricing?model=bytedance%2Fseedance-2",
-        data: { model: "bytedance/seedance-2", pricing: { mode: "per_second", per_second_usd: 0.1045 } },
+        source: "https://hypit.ai/v1/pricing?model=seedance-2",
+        data: { model: "seedance-2", pricing: { mode: "per_second", per_second_usd: 0.1045 } },
       }],
     }, {
       request: "image:one", capability: "@hypit/gpt-image@1#gpt-image-2", status: "resolved",
@@ -195,7 +195,7 @@ test("pricing presents Provider-owned material beside the corresponding Needs", 
   } as const;
   const output = capture(human, presentation);
   assert.match(output, /Provider pricing information/u);
-  assert.match(output, /https:\/\/hypit\.ai\/v1\/pricing\?model=bytedance%2Fseedance-2/u);
+  assert.match(output, /https:\/\/hypit\.ai\/v1\/pricing\?model=seedance-2/u);
   assert.match(output, /"per_second_usd": 0\.1045/u);
   assert.match(output, /duration 5 · resolution 720p/u);
   assert.match(output, /Pricing page\s+https:\/\/images\.example\/pricing/u);
@@ -362,6 +362,7 @@ test("help is concise and describes stable rather than complete output", () => {
   assert.match(output, /^Hypit\n/u);
   assert.match(output, /Results/u);
   assert.match(output, /stable machine view/u);
+  assert.match(output, /programs prepare\|up\|status\|down/u);
   assert.doesNotMatch(output, /Typical flow|complete machine-readable|image --prompt/u);
 });
 

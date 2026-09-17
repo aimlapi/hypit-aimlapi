@@ -1,5 +1,5 @@
-import { execFile, spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { execFile } from "node:child_process";
+import { windowsCredential } from "./windows.js";
 
 import { verifyCredentialRef } from "@hypit/runtime";
 import type {
@@ -59,64 +59,6 @@ function macosDeleter(service: string): OsCredentialDeleter {
   });
 }
 
-type WindowsCredentialResult = {
-  readonly found?: boolean;
-  readonly deleted?: boolean;
-  readonly secret?: string;
-};
-
-const windowsScript = fileURLToPath(new URL("../runtime/windows-credential.ps1", import.meta.url));
-
-function windowsCredential(
-  operation: "read" | "write" | "delete",
-  service: string,
-  account: string,
-  secret?: string,
-): Promise<WindowsCredentialResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn("powershell.exe", [
-      "-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
-      "-File", windowsScript, "-Operation", operation,
-    ], { shell: false, windowsHide: true, stdio: ["pipe", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    let settled = false;
-    const fail = (error: Error): void => {
-      if (settled) return;
-      settled = true;
-      reject(error);
-    };
-    child.on("error", fail);
-    child.stdout.on("data", (chunk: Buffer) => {
-      stdout += chunk.toString("utf8");
-      if (stdout.length > 4 * 1024 * 1024) fail(new Error("Windows credential response is too large"));
-    });
-    child.stderr.on("data", (chunk: Buffer) => {
-      stderr += chunk.toString("utf8");
-      if (stderr.length > 64 * 1024) fail(new Error("Windows credential error is too large"));
-    });
-    child.on("close", (code) => {
-      if (settled) return;
-      if (code !== 0) {
-        fail(new Error(`Windows credential ${operation} for ${account} failed${stderr.trim().length === 0 ? "" : `: ${stderr.trim()}`}`));
-        return;
-      }
-      try {
-        const result = JSON.parse(stdout.replace(/^\uFEFF/u, "").trim()) as WindowsCredentialResult;
-        settled = true;
-        resolve(result);
-      } catch {
-        fail(new Error(`Windows credential ${operation} returned an invalid response`));
-      }
-    });
-    child.stdin.end(JSON.stringify({
-      service,
-      account,
-      ...(secret === undefined ? {} : { secret: Buffer.from(secret, "utf8").toString("base64") }),
-    }));
-  });
-}
-
 function windowsBackend(): {
   readonly read: OsCredentialReader;
   readonly write: OsCredentialWriter;
@@ -141,7 +83,12 @@ function platformBackend(service: string) {
     return { read: macosReader(service), write: macosWriter(service), remove: macosDeleter(service) };
   }
   if (process.platform === "win32") return windowsBackend();
-  throw new Error("OS CredentialStore supports macOS and Windows only");
+  // A Profile that selects this Store cannot be repaired by anything the user does here, and the
+  // other Stores are the answer, so name them where the failure is read.
+  throw new Error("OS CredentialStore supports macOS and Windows only; select "
+    + "@hypit/credential-store-platform (platform locker, owner-private file on Linux), "
+    + "@hypit/credential-store-file (owner-private local file) or @hypit/credential-store-env "
+    + "(externally supplied value) in this Profile's credentials instead");
 }
 
 /** One logical writable store backed by the current user's OS credential locker. */

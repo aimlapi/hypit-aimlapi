@@ -84,7 +84,7 @@ State what is being fetched or run, how it is progressing and what would make th
 different. [Local tools](local-tools.md#make-network-preparation-practical) covers caches, mirrors and
 network diagnosis. Time already spent installing is not a reason to continue an unsuitable route.
 
-Switching from BYOK or local execution to HypiHub changes the selected service and may change the
+Switching from another service or local execution to HypiHub changes the selected service and may change the
 billing account. That remains a user choice when the earlier route encounters authentication, quota,
 rate-limit or service errors. An OAuth page follows the decision to connect the selected account.
 
@@ -137,7 +137,7 @@ current directory, `package.json` and explicit paths determine which project the
 | Runtime Profile | which environmental packages, Endpoint instances, credentials, and bindings are selected |
 | Provider Endpoint | how one capability is supported, diagnosed, invoked, and priced |
 | Credential Store | how one explicitly named secret is resolved |
-| Managed Program | how a selected local Endpoint's long-lived helper is prepared and probed |
+| Managed Program | how a selected local Endpoint's resources are prepared and probed, and its helper is started when one exists |
 | Project Result repository | where finished Build Results and their public Outputs live |
 
 Changing an Endpoint does not change the Author Source. Result storage is selected separately in
@@ -172,7 +172,7 @@ These names describe different facts about the same work:
 For example, an authored video request determines what to generate. The Run can satisfy its output
 with an existing Result so that generation is no longer demanded. If it remains demanded, the Model
 produces a Need; the Profile resolves its capability to one Endpoint; the Provider maps that request
-to the chosen service. The same author semantics can therefore work through BYOK or HypiHub when
+to the chosen service. The same author semantics can therefore work through different services when
 both implement the exact capability, without putting those account choices into SVML.
 
 A binding key is the complete `name@version#capability`, not a guessed vendor model label. For
@@ -242,26 +242,49 @@ and project implementation; see [Build execution scope](../production/builds.md#
 
 ## Put secrets behind credential references
 
-A Profile names a Credential Store and key; the secret stays in that store. The writable OS store
-uses macOS Keychain or Windows Credential Locker. The environment store reads one explicitly named
-environment variable and is read-only.
+A Profile names a Credential Store and key; the secret stays in that store. The platform store is the
+portable choice: macOS Keychain or Windows Credential Locker on those two platforms, and an
+owner-private file on Linux. The OS store is that same locker on macOS and Windows only. The
+environment store reads one explicitly named environment variable and is read-only. The file store
+always stores an unencrypted document outside the project, never in an OS locker.
 
-Inspect one Endpoint's credential slots without revealing their values:
+`runtime init` writes an editable starter that selects the platform store, so the Profile it writes
+opens on every host without an edit. Selecting one Store explicitly instead means naming it in
+`credentials` and in the Endpoint's credential reference, as
+`{ "file": { "use": "@hypit/credential-store-file" } }` and
+`{ "store": "file", "key": "<chosen-key>" }`, while preserving other Endpoint settings and bindings. File-backed storage writes into `credentials` under
+the Host state root printed by `hypit paths`, and an optional Store `config.path` chooses another
+private directory; ensure a Windows directory's ACL is private to the user. Preserve an existing
+Store choice; never switch or migrate credentials just because one Store could not read them.
+
+Inspect credential slots only when the selected Endpoint declares them. A credential-free Endpoint
+such as local media processing needs no auth command; prepare its tools directly. For an Endpoint
+with declared slots, inspect their state without revealing values:
 
 ```bash
-hypit auth status hypihub.default
+hypit auth status <selected-endpoint>
 ```
 
 Once the user has chosen to connect that account, use its declared acquisition flow or the selected
 store's interactive input:
 
 ```bash
-hypit auth login hypihub.default
+hypit auth login <selected-endpoint>
 ```
 
-For an OAuth Endpoint, this command opens the Provider's browser flow immediately. Another Endpoint
-may securely prompt for its exact secret or accept `--from <secret-file>`. An Endpoint backed by the read-only environment store is configured
-in the Worker process environment instead.
+The Endpoint already identifies the service and its Provider. `auth status` shows whether a
+credential exists and the Provider's declared browser acquisition when present. For a writable
+OAuth Endpoint, `auth login` opens that browser flow immediately; without a browser acquisition it
+securely prompts for the secret. `--from <secret-file>` explicitly imports a secret instead of
+opening OAuth. An Endpoint backed by the read-only environment store is configured in the Worker
+process environment instead. Login and logout use the declared slot and write capability without
+reading the old credential; a damaged stored value can therefore be replaced or removed. Status and
+execution still report read errors.
+
+For example, after choosing HypiHub, `hypit auth login hypihub.default` uses its browser login;
+`hypit auth login hypihub.default --from /private/path/hypihub-key.txt` instead stores a HypiHub API
+key. A different service uses its own configured Endpoint and key. Credential entry does not create
+that service's Provider, select a model binding, or transfer another service's balance to HypiHub.
 
 Keep secrets out of Author Sources, Runs, Runtime Profile JSON, project documentation, command
 arguments, commits, and conversation text. Ask the user to complete a Provider browser flow or secure
@@ -287,6 +310,13 @@ submits no generation request. A successful login followed by a failing doctor i
 report the Provider's current explanation rather than treating credential storage as proof of
 reachability.
 
+Keep the failing request's scope with its evidence: selected Endpoint, requested model or capability,
+and the returned status, code and explanation. These describe what failed; infer a cause only as far
+as they support it. For example, `model_not_found` establishes that this request could not reach the
+named model through that route, but does not itself establish a missing payment or permission.
+Use the account-visible service information when investigating availability; a public model catalogue
+alone cannot establish access for this account. Explain what is known and what still needs checking.
+
 `plan` knows the chosen Target and Candidates, so it identifies the capabilities this Run will demand
 and applies the selected Endpoint's normal request-support check. Its preflight checks configuration,
 credential presence, packages, executables, and relevant Managed Programs without actively probing a
@@ -300,6 +330,8 @@ support interpretation, Script and visual planning. Existing media can support c
 HyperFrames MG, Caption and Typography when those serve the Brief. Generated performances and
 measured speech timing depend on the corresponding capabilities becoming available. Keep the
 completed work and the remaining dependency clear so the user can decide how to proceed.
+When showing that work, [composition review](../production/review.md#show-what-the-current-work-establishes)
+helps distinguish useful intermediate evidence from the intended deliverable.
 
 When the user brings another model, service, or Key, use
 [Models and Providers](model-and-provider.md) to distinguish credential setup, Endpoint configuration,
@@ -308,12 +340,22 @@ package APIs. The actual service protocol determines whether an existing Provide
 
 ## Prepare the selected environment
 
-After choosing the services for the next work, use `hypit programs up --endpoint <instance>` to
-prepare those helpers, or `hypit runtime up --endpoint <instance>` to start the Worker as well.
+After choosing the services and their needed resources, use `hypit programs prepare --endpoint
+<instance>` to prepare without starting helpers, `hypit programs up --endpoint <instance>` to prepare
+and start them, or `hypit runtime up --endpoint <instance>` to start the Worker as well. Preparation
+remains available for a running service; process health alone does not establish new resource readiness.
 Repeat the flag for several instances. Omission deliberately prepares the whole Profile, even when
 a capability is bound elsewhere. Preparation follows each Provider's declared dependencies and
 Programs; it does not log into remote accounts. `hypit doctor --endpoint <instance>` actively checks
-that selected service. `plan` already narrows readiness to the Endpoints resolved for the Run.
+that selected service when diagnosis is useful. `plan` already narrows readiness to the Endpoints
+resolved for the Run. Choose the command for the current question; these are not mandatory checks
+before every Build. Resource readiness does not imply that a helper process exists.
+
+For example, local media work can use `hypit programs prepare --endpoint media.local` to prepare
+only, or `hypit runtime up --endpoint media.local` when execution needs the Worker. Neither requires
+an account. Inspect tool readiness with `hypit programs status --endpoint media.local`, and Worker
+state with `hypit runtime status`. Account connection is a separate decision for services that
+actually declare credential slots.
 
 Use `local-tools.md` when a selected local binary or Managed Program needs installation or repair.
 Read `../production/builds.md` for how submission uses the prepared environment and Worker.

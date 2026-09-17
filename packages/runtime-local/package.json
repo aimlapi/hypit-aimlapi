@@ -24,7 +24,8 @@
     "@hypit/runtime-kit": "workspace:*",
     "@hypit/runtime-host-node": "workspace:*",
     "@hypit/store-sqlite": "workspace:*",
-    "@hypit/validation": "workspace:*"
+    "@hypit/validation": "workspace:*",
+    "koffi": "3.2.1"
   },
   "devDependencies": {
     "@hypit/build-result": "workspace:*",

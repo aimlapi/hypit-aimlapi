@@ -5,8 +5,8 @@
     "env": {
       "use": "@hypit/credential-store-env"
     },
-    "os": {
-      "use": "@hypit/credential-store-os"
+    "platform": {
+      "use": "@hypit/credential-store-platform"
     }
   },
   "endpoints": {
@@ -15,7 +15,7 @@
       "config": {
         "baseUrl": "https://hypit.ai",
         "apiKey": {
-          "store": "os",
+          "store": "platform",
           "key": "hypihub.oauth"
         },
         "defaultConcurrency": 4,

@@ -11,15 +11,45 @@ reusable Source directly, for example
 `<import as="ugc" source="@hypit/gpt-image-kits/phone-ugc-v1"/>`; resolving that Source does not
 activate package code.
 
-From any project:
+`hypit version` reports the Distribution version, physical root and launcher independently of a
+project or Runtime. `hypit version --check` also reads the package's `latest` tag at
+`https://registry.npmjs.org/`; `--registry <url>` explicitly selects another registry. `--json`
+returns `hypit.cli-version@1`. A failed check retains local facts, leaves the remote version unknown
+and exits nonzero. A different version is not automatically newer: the launcher may be a newer
+checkout or the mirror may lag. The command links release notes and never installs or updates.
+Skill installers own their separate installed copies; this command does not scan Agent directories.
+`hypit --version` remains a local version-only query.
+
+Commands below serve independent authoring decisions. Start with the current project's material;
+local inspection and estimation need no generation account:
 
 ```bash
 cd path/to/project
-hypit runtime init
-hypit auth login hypihub.default
-hypit doctor
-hypit runtime up
 hypit check main.svml
+hypit measure main.svml --segment hook --language en
+```
+
+When the work needs execution, the project selects a Runtime Profile. `hypit runtime init` creates
+an editable starter; its Endpoint entries describe available routes, not choices made by the user.
+Keep an existing chosen service, or configure the chosen local or hosted Provider and its capability
+bindings. HypiHub is the recommended integrated hosted route in the official Distribution; other
+services use project Provider packages. If the user chooses HypiHub,
+`hypit auth login hypihub.default` connects that account after choosing its CredentialStore.
+The starter selects the [platform CredentialStore](../credential-store-platform/README.md#select-it):
+macOS Keychain or Windows Credential Locker on those two platforms, and an owner-private file on
+Linux, so the Profile it writes needs no edit on any of them. Name another Store in `credentials` and
+in the Endpoint's credential reference — as the
+[file CredentialStore](../credential-store-file/README.md#select-it-before-login) shows — to choose it
+explicitly. This selection is configuration; execution never switches stores automatically.
+`hypit doctor --endpoint <name>` checks a selected Endpoint;
+`hypit runtime up --endpoint <name>` prepares that Endpoint and starts the Worker. Repeat the flag
+for several chosen Endpoints; omitting it prepares the whole Profile. `hypit programs up --endpoint
+<name>` prepares and starts a local helper independently of the Worker. `hypit programs prepare
+--endpoint <name>` only prepares its selected resources, including for a service already running.
+
+With the selected execution environment:
+
+```bash
 hypit plan build.svrun
 hypit build build.svrun --follow
 hypit status <build-id> --watch
@@ -29,7 +59,6 @@ hypit history <source-output-name> [--source ./main.svml]
 hypit inspect <build-id> [--output <source-output-name>]
 hypit get <build-id> --output final.video --to ./final.mp4
 hypit cancel <build-id>
-hypit doctor
 ```
 
 `transcribe` runs one immediate request through the selected Runtime Profile, with no Build,
@@ -41,9 +70,11 @@ hypit transcribe reference.mp4 --to notes/reference.transcript.json --language e
 hypit measure main.svml --segment hook --language en --pace normal --rounding round
 ```
 
-For `transcribe`, set `--language` to the spoken language: `en`, `zh` or `es`. Chinese speech uses `zh`, including
-Chinese speech containing English names; the requested language selects the recognition/alignment
-model, independently of the eventual caption font or script's simplified/traditional characters.
+For `transcribe`, set `--language` to an explicit lowercase two- or three-letter spoken language code,
+such as `en`, `zh` or `ko`. The selected service owns which languages it can align. Chinese speech uses `zh`, including
+Chinese speech containing English names. The request selects the recognition language and
+language-specific aligner; ASR size remains a deployment choice. Caption font and Script's
+simplified/traditional characters are independent authoring choices.
 
 `transcribe` uses the Profile's `whisperx-alignment` Endpoint (after
 extracting 16 kHz mono speech audio with ffmpeg). Direct invocation forwards the Provider's progress
@@ -62,6 +93,11 @@ comes back: pictures, clips and accepted voice references (`@hypit/mimo-speech`)
 that produced them, so they are declared in the Source and go through `plan` and `build`. To hear a
 voice or learn a passage's real length before authoring the rest, build a Run whose target is that
 speech output and reuse it as a Candidate.
+
+Provider selection is checked before `transcribe` invokes the service. Multiple matching Endpoints
+can remain in the Profile: `bindings` chooses one for the capability. An unsupported request reports
+the selected binding and Provider-owned rejection reasons so the author can adjust the request or
+choose a compatible Endpoint. It does not imply that an account needs payment or login.
 
 Two more families are local, stateless and spend nothing. `hypit media` exposes the source at chosen
 times and scales, and `hypit vocabulary`
@@ -111,7 +147,8 @@ Grid `samples` retain the requested times; `frames` contain the actual extracted
 It also reports every page path for `tiles`. The media layer reads existing timed text; transcription
 and its Endpoint remain separate. `boundaries` reports adjacent-frame
 change candidates and their measured scores; it does not suppress short changes or call them shots.
-`fetch` turns a link into a file with the pinned yt-dlp; [the downloader package](../yt-dlp/README.md)
+`prepare-fetch` explicitly prepares the locked downloader environment; `fetch` requires it and
+turns a link into a file with the pinned yt-dlp; [the downloader package](../yt-dlp/README.md)
 owns its dependencies, download choices and file handling. Commands that create evidence write only
 what `--to` names and refuse to overwrite. `vocabulary` reads the installed
 manifests: every package with its tags and models, or one package's Surfaces with their attributes,

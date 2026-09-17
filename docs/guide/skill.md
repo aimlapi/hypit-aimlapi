@@ -9,6 +9,8 @@ creative direction, and makes the pictures, performances, graphics, sound, and e
 
 ## Install the Skill
 
+[Use Hypit in your Agent](./agents.md) covers working environments and Agent-entry partners.
+
 ```bash
 npx skills add hypit-ai/hypit -g
 ```

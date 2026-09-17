@@ -1,4 +1,5 @@
-import { resolve } from "node:path";
+import { realpath } from "node:fs/promises";
+import { basename, dirname, resolve } from "node:path";
 
 import type { BuildResultRepository } from "@hypit/build-result";
 
@@ -13,10 +14,26 @@ import {
   projectPath,
 } from "../view.js";
 import type { OperationalWriter } from "./types.js";
+import { commandHint } from "../command-hint.js";
 
 export function isProjectResultCommand(args: CliCommand): args is ProjectResultCommand {
   return args.command === "builds" || args.command === "history" || args.command === "inspect"
     || args.command === "get" || (args.command === "result" && args.action === "edit");
+}
+
+/** History can name a deleted Source. Resolve existing directory links, keeping the absent suffix. */
+async function historySourcePath(path: string): Promise<string> {
+  let existing = resolve(path);
+  const suffix: string[] = [];
+  while (true) {
+    try { return resolve(await realpath(existing), ...suffix); }
+    catch (error) {
+      const parent = dirname(existing);
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT" || parent === existing) throw error;
+      suffix.unshift(basename(existing));
+      existing = parent;
+    }
+  }
 }
 
 /** Execute commands that need only project-owned Result history, never a Runtime. */
@@ -61,7 +78,7 @@ export async function runProjectResultCommand(input: {
   }
 
   if (args.command === "history") {
-    const source = args.source === undefined ? undefined : resolve(args.source);
+    const source = args.source === undefined ? undefined : await historySourcePath(args.source);
     const page = await browseBuildOutputHistory(repository, {
       projectRoot,
       output: args.outputName,
@@ -120,7 +137,7 @@ export async function runProjectResultCommand(input: {
         ] : []),
       ], [
         ...(build.failure === undefined ? [] : [`Reason    ${build.failure}`]),
-        ...(build.executionLog === undefined ? [] : [`Execution log    hypit logs ${build.id}`]),
+        ...(build.executionLog === undefined ? [] : [`Execution log    ${commandHint(["logs", build.id], { projectRoot })}`]),
         ...(build.operations ?? []).map((operation) =>
           `${operation.endpoint}: ${operation.status}${operation.receipt === undefined ? "" : ` · task ${operation.receipt.id}`}`
           + (operation.failure === undefined ? "" : ` · ${operation.failure.code}: ${operation.failure.message}`)),
@@ -176,7 +193,7 @@ export async function runProjectResultCommand(input: {
     kind: exported.kind,
     path: exported.path,
   };
-  const path = projectPath(exported.path, projectRoot);
+  const path = projectPath(await realpath(exported.path), projectRoot);
   write(machine, `Exported ${exported.output} → ${path}`, "success",
     args.presentation.verbose ? [
       ["Build", exported.build],

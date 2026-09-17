@@ -15,6 +15,7 @@
     "@hypit/component-kit": "workspace:*",
     "@hypit/composition": "workspace:*",
     "@hypit/elaborator": "workspace:*",
+    "@hypit/hyperframes": "workspace:*",
     "@hypit/media": "workspace:*",
     "@hypit/narrative": "workspace:*",
     "@hypit/program-space": "workspace:*",

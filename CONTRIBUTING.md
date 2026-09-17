@@ -17,7 +17,7 @@ contract, describe the approach in the issue first.
 
 ## Set up
 
-You need Node.js 22.12+ and pnpm 10.33, selected by the root `packageManager` field.
+You need Node.js 22.15+ and pnpm 10.33, selected by the root `packageManager` field.
 
 ```bash
 corepack enable
@@ -26,6 +26,12 @@ pnpm install --frozen-lockfile
 
 Live Builds additionally need Python 3.10–3.13, uv, ffmpeg and Chromium. The
 [Development Guide](https://hypit.ai/guide/develop/) lists what each one is for.
+
+For a Profile selecting local rendering, run `hypit programs up --runtime <profile> --endpoint
+<render-instance>` before the first render (or `hypit runtime up --runtime <profile>` to prepare
+the Profile and start its Worker). This explicitly prepares Chrome even when pnpm skips dependency
+build scripts. `hypit doctor --runtime <profile>` diagnoses missing setup without installing it.
+See the [local renderer README](packages/provider-hyperframes-local/README.md) for browser overrides.
 
 ## Make the change
 
@@ -57,9 +63,17 @@ Run `npm run pack:distribution` to build public types and write the release tarb
 `dist/release/`. This stages npm's selected files in a temporary directory and adapts the English
 README for the npm page: public image URLs, both GIFs, and a link to the full video examples.
 The repository READMEs remain unchanged. `dist/release/README.md` shows the packaged text.
-Publish the resulting tarball with `npm publish dist/release/hypit-hypit-<version>.tgz --access public`.
 
-For a formal release, commit the next stable npm version in `package.json` to `main`. Open
+With FFmpeg and FFprobe available, run
+`npm run check:distribution -- dist/release/hypit-hypit-<version>.tgz` to install that tarball outside
+the checkout, build its chat example component, prepare its font and local renderer, render and export
+the video, and decode the result. It disables implicit Puppeteer downloads, checks missing-browser
+diagnostics, and prepares the browser in an isolated cache. It uses a separate Hypit state directory, stops its Runtime Worker,
+and retains the temporary project on failure. The `npm package execution` workflow runs this on PRs
+and is reused by publication; publication uploads the same tarball that was installed and executed.
+
+For a formal release, use the existing GitHub Release workflow. Commit the next stable npm version
+in `package.json` to `main`. Open
 **Releases → Draft a new release**, choose that commit with tag `v<version>` (for example `v0.1.8`),
 write the release notes, and publish the Release. The tagged commit must contain this workflow.
 `Publish npm` verifies the tag/version match and that the commit belongs to main's history, runs
@@ -81,11 +95,23 @@ repository `hypit`, workflow `publish-npm.yml`, with direct `npm publish` enable
 name. The publishing job uses OIDC; no npm token secret is needed. An already published version
 cannot be overwritten. npm versions such as `0.1.2` are separate from the logical `@1` interfaces.
 
+Release notes should identify the changed user behavior and the affected installation. The npm
+Distribution and an installed Skill update separately: link the relevant Skill changes and describe
+both update paths when a release changes both. A saved video project and its existing materials
+are independent of either installation. After publication, verify the workflow result and npm's
+published version before telling users the update is available.
+
 ## Open the pull request
 
 Branch names and commit subjects share the same prefix: `feat/`, `fix/`, `docs/` for branches and
 `feat:`, `fix:`, `docs:` for commits.
 
+## Issue and PR analysis
+
+Maintainers can request a preliminary AI analysis of an issue or PR from the **Repository analysis**
+Actions workflow. Its advice appears only in that run's summary; issue/PR management stays with
+maintainers. See the [operator guide](.github/ISSUE_AUTOMATION_DESIGN.md) for inputs and limits.
+
 ## Getting help
 
-Ask in [Discord](https://discord.gg/85hnyQnxpn) or [Telegram](https://t.me/hypit).
+Ask in [Discord](https://discord.gg/85hnyQnxpn) or [Telegram](https://t.me/hypitai).

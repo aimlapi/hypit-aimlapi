@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@hypit/protocol": "workspace:*",
-    "koffi": "3.2.1"
+    "@hypit/file-io-node": "workspace:*"
   }
 }

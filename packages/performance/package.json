@@ -25,6 +25,7 @@
     "@hypit/markup": "workspace:*",
     "@hypit/temporal": "workspace:*",
     "@hypit/temporal-markup": "workspace:*",
-    "@hypit/media-track": "workspace:*"
+    "@hypit/media-track": "workspace:*",
+    "@hypit/visual-ir": "workspace:*"
   }
 }
