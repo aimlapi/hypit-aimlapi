@@ -25,6 +25,7 @@ const packageDirectories = [
   "provider-html-local",
   "provider-image-opencv-local",
   "provider-whisperx-local",
+  "provider-aimlapi",
   "provider-beatapi",
   "provider-hiapi",
   "provider-monid",
@@ -42,6 +43,7 @@ const defaultPackages = [
   "@hypit/provider-whisperx-local",
 ];
 const optionalPackages = [
+  "@hypit/provider-aimlapi",
   "@hypit/provider-beatapi",
   "@hypit/provider-hiapi",
   "@hypit/provider-monid",

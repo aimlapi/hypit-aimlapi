@@ -278,6 +278,7 @@
     "@hypit/protocol": "workspace:*",
     "@hypit/markup": "workspace:*",
     "@hypit/run": "workspace:*",
+    "@hypit/provider-aimlapi": "workspace:*",
     "@hypit/provider-beatapi": "workspace:*",
     "@hypit/provider-hiapi": "workspace:*",
     "@hypit/provider-html-local": "workspace:*",

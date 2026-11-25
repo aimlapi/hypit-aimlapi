@@ -183,6 +183,9 @@ importers:
       '@hypit/protocol':
         specifier: workspace:*
         version: link:packages/protocol
+      '@hypit/provider-aimlapi':
+        specifier: workspace:*
+        version: link:packages/provider-aimlapi
       '@hypit/provider-beatapi':
         specifier: workspace:*
         version: link:packages/provider-beatapi
@@ -1862,6 +1865,37 @@ importers:
   packages/project: {}
 
   packages/protocol: {}
+
+  packages/provider-aimlapi:
+    dependencies:
+      '@hypit/generation':
+        specifier: workspace:^0.1.0
+        version: link:../generation
+    devDependencies:
+      '@hypit/endpoint':
+        specifier: workspace:*
+        version: link:../endpoint
+      '@hypit/executor':
+        specifier: workspace:*
+        version: link:../executor
+      '@hypit/hypit':
+        specifier: workspace:*
+        version: link:../..
+      '@hypit/nano-banana':
+        specifier: workspace:*
+        version: link:../nano-banana
+      '@hypit/protocol':
+        specifier: workspace:*
+        version: link:../protocol
+      '@hypit/runtime':
+        specifier: workspace:*
+        version: link:../runtime
+      '@hypit/runtime-local':
+        specifier: workspace:*
+        version: link:../runtime-local
+      '@hypit/video':
+        specifier: workspace:*
+        version: link:../video
 
   packages/provider-beatapi:
     dependencies:
